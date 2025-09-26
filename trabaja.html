@@ -31,12 +31,18 @@
 
 <h3 class="section-title">Trabaja con Nosotros</h3>
 <p>¿Quieres unirte a nuestro equipo? Completa tus datos:</p>
-<form class="form" onsubmit="event.preventDefault();window.open('mailto:yyy?subject=Postulación%20-%20Centro%20de%20Terapias');">
-  <input class="input" required placeholder="Nombre completo">
-  <input class="input" required placeholder="Correo">
-  <input class="input" required placeholder="Teléfono">
-  <textarea class="textarea" placeholder="Experiencia/Especialidad"></textarea>
-  <button class="btn" type="submit">Enviar Postulación</button>
+
+<!-- Cambiado: ahora envía a WhatsApp con los datos concatenados -->
+<form class="form" onsubmit="event.preventDefault(); sendWhatsAppPostulacion();">
+  <input class="input" id="post-name" required placeholder="Nombre completo">
+  <input class="input" id="post-email" required type="email" placeholder="Correo">
+  <input class="input" id="post-phone" required type="tel" placeholder="Teléfono">
+  <label for="post-dt1">Fecha y hora, que solicita cita 1</label>
+  <input class="input" id="post-dt1" type="datetime-local" required>
+  <label for="post-dt2">Fecha y hora, que solicita cita 2</label>
+  <input class="input" id="post-dt2" type="datetime-local">
+  <textarea class="textarea" id="post-msg" placeholder="Experiencia/Especialidad o Mensaje adicional"></textarea>
+  <button class="btn" type="submit">Enviar Postulación por WhatsApp</button>
 </form>
 
 </main>
@@ -63,6 +69,43 @@
   <div class="copy">&copy; 2025 Centro de Terapias Alternativas</div>
 </footer>
 <a class="whatsapp-fab" href="https://wa.me/51912610224?text=Hola%20quisiera%20una%20cita" target="_blank">WhatsApp</a>
+
+<script>
+  function formatDT(value) {
+    // Convierte "YYYY-MM-DDTHH:mm" a "DD/MM/YYYY HH:mm"
+    if (!value) return "";
+    const d = new Date(value);
+    if (isNaN(d)) return value;
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth()+1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+  }
+
+  function sendWhatsAppPostulacion() {
+    const name  = document.getElementById('post-name').value.trim();
+    const email = document.getElementById('post-email').value.trim();
+    const phone = document.getElementById('post-phone').value.trim();
+    const dt1   = formatDT(document.getElementById('post-dt1').value);
+    const dt2   = formatDT(document.getElementById('post-dt2').value);
+    const msg   = document.getElementById('post-msg').value.trim();
+
+    const text = 
+`Postulación - Trabaja con Nosotros
+Nombre: ${name}
+Correo: ${email}
+Teléfono: ${phone}
+Fecha y hora, que solicita cita 1: ${dt1}
+Fecha y hora, que solicita cita 2: ${dt2 || '—'}
+Mensaje: ${msg || '—'}`;
+
+    const url = "https://wa.me/51912610224?text=" + encodeURIComponent(text);
+    // Si WhatsApp Desktop está con sesión iniciada, abrirá directo y mostrará el texto prellenado (no pedirá QR).
+    window.open(url, "_blank");
+  }
+</script>
 
 </body>
 </html>
