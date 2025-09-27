@@ -37,11 +37,17 @@
 <div class="card"><div class="media"><video controls preload="metadata" src="Ceragem3.mp4"></video></div></div>
 </div>
 <h3 class="section-title">Solicitar Cita</h3>
-<form class="form" onsubmit="event.preventDefault();window.open('https://wa.me/51912610224?text='+encodeURIComponent('Hola, quiero una cita de Camilla Ceragem. Mi nombre es: '));">
-  <input class="input" required placeholder="Nombre completo">
-  <input class="input" required placeholder="Correo">
-  <input class="input" required placeholder="Teléfono">
-  <textarea class="textarea" placeholder="Mensaje adicional"></textarea>
+
+<!-- Cambiado solo lo necesario: IDs + 2 fechas y envío a WhatsApp con datos concatenados -->
+<form class="form" onsubmit="event.preventDefault(); sendWhatsAppCeragem();">
+  <input class="input" id="cera-name" required placeholder="Nombre completo">
+  <input class="input" id="cera-email" required placeholder="Correo">
+  <input class="input" id="cera-phone" required placeholder="Teléfono">
+  <label for="cera-dt1">Fecha y hora, que solicita cita 1</label>
+  <input class="input" id="cera-dt1" type="datetime-local" required>
+  <label for="cera-dt2">Fecha y hora, que solicita cita 2</label>
+  <input class="input" id="cera-dt2" type="datetime-local">
+  <textarea class="textarea" id="cera-msg" placeholder="Mensaje adicional"></textarea>
   <button class="btn" type="submit">Enviar por WhatsApp</button>
 </form>
 
@@ -69,6 +75,41 @@
   <div class="copy">&copy; 2025 Centro de Terapias Alternativas</div>
 </footer>
 <a class="whatsapp-fab" href="https://wa.me/51912610224?text=Hola%20quisiera%20una%20cita" target="_blank">WhatsApp</a>
+
+<script>
+  function formatDT(value) {
+    if (!value) return "";
+    const d = new Date(value);
+    if (isNaN(d)) return value;
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mi = String(d.getMinutes()).padStart(2,'0');
+    return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+  }
+
+  function sendWhatsAppCeragem() {
+    const name  = document.getElementById('cera-name').value.trim();
+    const email = document.getElementById('cera-email').value.trim();
+    const phone = document.getElementById('cera-phone').value.trim();
+    const dt1   = formatDT(document.getElementById('cera-dt1').value);
+    const dt2   = formatDT(document.getElementById('cera-dt2').value);
+    const msg   = document.getElementById('cera-msg').value.trim();
+
+    const text =
+`Solicitud de Cita - Camilla Ceragem
+Nombre: ${name}
+Correo: ${email}
+Teléfono: ${phone}
+Fecha y hora, que solicita cita 1: ${dt1}
+Fecha y hora, que solicita cita 2: ${dt2 || '—'}
+Mensaje: ${msg || '—'}`;
+
+    const url = "https://wa.me/51912610224?text=" + encodeURIComponent(text);
+    window.open(url, "_blank");
+  }
+</script>
 
 </body>
 </html>
